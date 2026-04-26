@@ -44,27 +44,25 @@
         :disabled="loading"
       />
     </form>
-    
-    <div class="mt-6 text-center text-sm text-gray-500">
-      <p>Demo Admin: admin@mca.edu / admin123</p>
-      <p>Demo Student: harsh@student.edu / student123</p>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseInput from '@/components/base/BaseInput.vue'
 import BaseButton from '@/components/base/BaseButton.vue'
 import API_BASE_URL from '@/config/api'
 
 const router = useRouter()
-const email = ref('')
-const password = ref('')
-const role = ref('student')
 const loading = ref(false)
 const error = ref('')
+
+const form = reactive({
+  email: '',
+  password: '',
+  role: 'student'
+})
 
 const handleLogin = async () => {
   loading.value = true
@@ -73,7 +71,7 @@ const handleLogin = async () => {
     const response = await fetch(`${API_BASE_URL}/api/auth/login.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value, password: password.value, role: role.value })
+      body: JSON.stringify(form)
     })
     
     const data = await response.json()
