@@ -17,7 +17,10 @@ $username = getenv('DB_USER') ?: 'root';
 $password = getenv('DB_PASS') ?: '';
 
 try {
-    $conn = new PDO("mysql:host=" . $host . ";port=" . $port . ";dbname=" . $db_name, $username, $password);
+    $options = array(
+        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false, // TiDB Cloud requires SSL
+    );
+    $conn = new PDO("mysql:host=" . $host . ";port=" . $port . ";dbname=" . $db_name, $username, $password, $options);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch(PDOException $exception) {
