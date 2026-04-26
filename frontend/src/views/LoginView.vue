@@ -89,7 +89,7 @@ const handleLogin = async () => {
       error.value = data.message || 'Login failed'
     }
   } catch (err) {
-    error.value = 'Network error. Make sure XAMPP is running.'
+    error.value = err || err.message;
     console.error(err)
   } finally {
     loading.value = false

@@ -12,8 +12,8 @@ COPY . /var/www/html/
 # Set working directory
 WORKDIR /var/www/html/
 
-# Configure Apache to allow overrides
-RUN sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+# Configure Apache to allow overrides globally
+RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 # Expose port 80
 EXPOSE 80
