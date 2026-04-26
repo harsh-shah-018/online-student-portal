@@ -76,7 +76,7 @@ const handleLogin = async () => {
     
     const data = await response.json()
     
-    if (response.ok) {
+    if (response.ok && data.user && data.role) {
       localStorage.setItem('user', JSON.stringify(data.user))
       localStorage.setItem('role', data.role)
       
@@ -86,7 +86,7 @@ const handleLogin = async () => {
         router.push('/student')
       }
     } else {
-      error.value = data.message || 'Login failed'
+      error.value = data.message || data.error || 'Login failed. Please check your credentials.'
     }
   } catch (err) {
     error.value = err || err.message;
