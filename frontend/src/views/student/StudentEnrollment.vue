@@ -37,7 +37,7 @@
 import { ref, onMounted } from 'vue'
 import BaseButton from '@/components/base/BaseButton.vue'
 import { useToast } from 'primevue/usetoast'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const courses = ref([])
 const loading = ref(true)
@@ -46,8 +46,8 @@ const toast = useToast()
 const fetchCourses = async () => {
   const user = JSON.parse(localStorage.getItem('user'))
   try {
-    const res = await fetch(`${API_BASE_URL}/api/student/enrollments.php?student_id=${user.student_id}`)
-    courses.value = await res.json()
+    const res = await api.get(`/api/student/enrollments.php?student_id=${user.student_id}`)
+    courses.value = res.data
   } catch(e) { console.error(e) }
   loading.value = false
 }
@@ -55,11 +55,7 @@ const fetchCourses = async () => {
 const enroll = async (course_id) => {
   const user = JSON.parse(localStorage.getItem('user'))
   try {
-    await fetch('${API_BASE_URL}/api/student/enrollments.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ student_id: user.student_id, course_id: course_id })
-    })
+    await api.post('/api/student/enrollments.php', { student_id: user.student_id, course_id: course_id })
     toast.add({ severity: 'success', summary: 'Enrollment Requested', detail: 'Admin will review your request.', life: 3000 })
     await fetchCourses()
   } catch(e) { console.error(e) }

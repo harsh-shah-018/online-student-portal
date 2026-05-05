@@ -52,9 +52,11 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseInput from '@/components/base/BaseInput.vue'
 import BaseButton from '@/components/base/BaseButton.vue'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
+import { useCounterStore } from '@/stores/counter'
 
 const router = useRouter()
+const store = useCounterStore()
 const loading = ref(false)
 const error = ref('')
 
@@ -68,17 +70,11 @@ const handleLogin = async () => {
   loading.value = true
   error.value = ''
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    })
+    const response = await api.post('/api/auth/login.php', form)
+    const data = response.data
     
-    const data = await response.json()
-    
-    if (response.ok && data.user && data.role) {
-      localStorage.setItem('user', JSON.stringify(data.user))
-      localStorage.setItem('role', data.role)
+    if (data.user && data.role) {
+      store.login(data.user, data.role)
       
       if (data.role === 'admin') {
         router.push('/admin')
@@ -89,7 +85,7 @@ const handleLogin = async () => {
       error.value = data.message || data.error || 'Login failed. Please check your credentials.'
     }
   } catch (err) {
-    error.value = err || err.message;
+    error.value = err.response?.data?.message || err.response?.data?.error || err.message || 'An error occurred during login.'
     console.error(err)
   } finally {
     loading.value = false

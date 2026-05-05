@@ -126,7 +126,7 @@ import BaseModal from '@/components/base/BaseModal.vue'
 import BaseInput from '@/components/base/BaseInput.vue'
 import Column from 'primevue/column'
 import { useToast } from 'primevue/usetoast'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const data = ref({ marks: [], attendance: [], skills: [], physical_activities: [] })
 const loading = ref(true)
@@ -140,8 +140,8 @@ const form = reactive({})
 const fetchAcademicData = async () => {
   const user = JSON.parse(localStorage.getItem('user'))
   try {
-    const res = await fetch(`${API_BASE_URL}/api/student/academic.php?student_id=${user.student_id}`)
-    data.value = await res.json()
+    const res = await api.get(`/api/student/academic.php?student_id=${user.student_id}`)
+    data.value = res.data
   } catch(e) { console.error(e) }
   loading.value = false
 }
@@ -169,12 +169,9 @@ const saveItem = async (type) => {
   const user = JSON.parse(localStorage.getItem('user'))
   const method = isEdit.value ? 'PUT' : 'POST'
   try {
-    const res = await fetch(`${API_BASE_URL}/api/student/academic.php`, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, type, student_id: user.student_id })
-    })
-    if (res.ok) {
+    const payload = { ...form, type, student_id: user.student_id }
+    const res = await api[method.toLowerCase()]('/api/student/academic.php', payload)
+    if (res.data) {
       toast.add({ severity: 'success', summary: 'Success', detail: `Record ${isEdit.value ? 'updated' : 'added'}`, life: 3000 })
       showSkillModal.value = false
       showActivityModal.value = false
@@ -187,11 +184,7 @@ const deleteItem = async (type, id) => {
   if (!confirm('Are you sure you want to delete this?')) return
   const user = JSON.parse(localStorage.getItem('user'))
   try {
-    const res = await fetch(`${API_BASE_URL}/api/student/academic.php`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, student_id: user.student_id, [type === 'skill' ? 'skill_id' : 'activity_id']: id })
-    })
+    const res = await api.delete('/api/student/academic.php', { data: { type, student_id: user.student_id, [type === 'skill' ? 'skill_id' : 'activity_id']: id } })
     if (res.ok) {
       toast.add({ severity: 'info', summary: 'Deleted', detail: 'Record removed', life: 3000 })
       await fetchAcademicData()

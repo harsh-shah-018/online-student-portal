@@ -67,7 +67,7 @@ import BaseTable from '@/components/base/BaseTable.vue'
 import BaseModal from '@/components/base/BaseModal.vue'
 import Column from 'primevue/column'
 import { useToast } from 'primevue/usetoast'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const library = ref({ books: [], issues: [] })
 const showAddModal = ref(false)
@@ -77,18 +77,14 @@ const form = reactive({ title: '', author: '', total_copies: 1 })
 
 const fetchLibrary = async () => {
   try {
-    const res = await fetch('${API_BASE_URL}/api/admin/library.php')
-    library.value = await res.json()
+    const res = await api.get('/api/admin/library.php')
+    library.value = res.data
   } catch(e) { console.error(e) }
 }
 
 const addBook = async () => {
   try {
-    await fetch('${API_BASE_URL}/api/admin/library.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    })
+    await api.post('/api/admin/library.php', form)
     showAddModal.value = false
     form.title = ''; form.author = ''; form.total_copies = 1;
     await fetchLibrary()
@@ -99,11 +95,7 @@ const addBook = async () => {
 const deleteBook = async (id) => {
   if(!confirm('Delete this book?')) return
   try {
-    await fetch('${API_BASE_URL}/api/admin/library.php', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ book_id: id })
-    })
+    await api.delete('/api/admin/library.php', { data: { book_id: id } })
     await fetchLibrary()
     toast.add({ severity: 'info', summary: 'Deleted', detail: 'Book removed from library', life: 3000 })
   } catch(e) { console.error(e) }

@@ -6,7 +6,8 @@
           <i class="pi pi-graduation-cap text-blue-600 text-2xl"></i>
           <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">EduPortal System</h1>
         </div>
-        <nav v-if="$route.name !== 'login'" class="flex items-center gap-4">
+        <nav v-if="$route.name !== 'login' && user" class="flex items-center gap-4">
+          <span class="text-sm font-medium text-gray-700">Welcome, {{ user.name }}</span>
           <button @click="logout" class="text-sm font-medium text-gray-600 hover:text-red-600 transition-colors">
             <i class="pi pi-sign-out mr-1"></i> Logout
           </button>
@@ -22,15 +23,16 @@
 </template>
 
 <script setup>
-import { RouterView, useRouter } from 'vue-router'
+import { RouterView } from 'vue-router'
 import Toast from 'primevue/toast'
+import { useCounterStore } from '@/stores/counter'
+import { computed } from 'vue'
 
-const router = useRouter()
+const store = useCounterStore()
+const user = computed(() => store.user)
 
 const logout = () => {
-  localStorage.removeItem('user')
-  localStorage.removeItem('role')
-  router.push('/')
+  store.logout()
 }
 </script>
 

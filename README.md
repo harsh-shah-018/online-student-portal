@@ -26,7 +26,9 @@
    ```bash
    cd frontend
    ```
-2. Install the necessary dependencies (Vue, Tailwind CSS, PrimeVue).
+2. Verify that your `frontend/.env` file correctly points to your backend:
+   `VITE_API_BASE_URL=http://localhost/MCA Project/StudentRegistrationSystem/backend`
+3. Install the necessary dependencies (Vue, Tailwind CSS, PrimeVue, Axios, Pinia).
    ```bash
    npm install
    ```

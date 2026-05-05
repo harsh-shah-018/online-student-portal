@@ -51,7 +51,7 @@ import BaseInput from '@/components/base/BaseInput.vue'
 import BaseTable from '@/components/base/BaseTable.vue'
 import Column from 'primevue/column'
 import { useToast } from 'primevue/usetoast'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const payments = ref([])
 const loading = ref(false)
@@ -65,8 +65,8 @@ const form = reactive({
 const fetchPayments = async () => {
   const user = JSON.parse(localStorage.getItem('user'))
   try {
-    const res = await fetch(`${API_BASE_URL}/api/student/fees.php?student_id=${user.student_id}`)
-    payments.value = await res.json()
+    const res = await api.get(`/api/student/fees.php?student_id=${user.student_id}`)
+    payments.value = res.data
   } catch(e) { console.error(e) }
 }
 
@@ -74,11 +74,7 @@ const payFee = async () => {
   loading.value = true
   const user = JSON.parse(localStorage.getItem('user'))
   try {
-    await fetch('${API_BASE_URL}/api/student/fees.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ student_id: user.student_id, amount: form.amount, payment_method: form.payment_method })
-    })
+    await api.post('/api/student/fees.php', { student_id: user.student_id, amount: form.amount, payment_method: form.payment_method })
     toast.add({ severity: 'success', summary: 'Payment Successful', detail: 'Fee receipt generated.', life: 3000 })
     form.amount = ''
     await fetchPayments()

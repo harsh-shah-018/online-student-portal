@@ -48,15 +48,15 @@ import { ref, onMounted } from 'vue'
 import BaseButton from '@/components/base/BaseButton.vue'
 import BaseTable from '@/components/base/BaseTable.vue'
 import Column from 'primevue/column'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const data = ref({ books: [], my_issues: [] })
 
 const fetchLibrary = async () => {
   const user = JSON.parse(localStorage.getItem('user'))
   try {
-    const res = await fetch(`${API_BASE_URL}/api/student/library.php?student_id=${user.student_id}`)
-    data.value = await res.json()
+    const res = await api.get(`/api/student/library.php?student_id=${user.student_id}`)
+    data.value = res.data
   } catch(e) { console.error(e) }
 }
 

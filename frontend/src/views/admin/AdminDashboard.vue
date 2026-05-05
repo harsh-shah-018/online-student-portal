@@ -70,7 +70,7 @@ import { useRouter } from 'vue-router'
 import BaseButton from '@/components/base/BaseButton.vue'
 import BaseTable from '@/components/base/BaseTable.vue'
 import Column from 'primevue/column'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const router = useRouter()
 const stats = ref(null)
@@ -83,8 +83,8 @@ onMounted(async () => {
   }
   
   try {
-    const response = await fetch('${API_BASE_URL}/api/admin/dashboard.php')
-    stats.value = await response.json()
+    const response = await api.get('/api/admin/dashboard.php')
+    stats.value = response.data
   } catch (err) {
     console.error("Failed to load dashboard data", err)
   }

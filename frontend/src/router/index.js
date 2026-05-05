@@ -71,4 +71,25 @@ const router = createRouter({
   ]
 })
 
+router.beforeEach((to, from, next) => {
+  const user = localStorage.getItem('user')
+  const role = localStorage.getItem('role')
+
+  if (to.name !== 'login' && !user) {
+    next({ name: 'login' })
+  } else if (to.name === 'login' && user) {
+    if (role === 'admin') {
+      next({ name: 'admin-dashboard' })
+    } else {
+      next({ name: 'student-dashboard' })
+    }
+  } else if (to.path.startsWith('/admin') && role !== 'admin') {
+    next({ name: 'student-dashboard' })
+  } else if (to.path.startsWith('/student') && role !== 'student') {
+    next({ name: 'admin-dashboard' })
+  } else {
+    next()
+  }
+})
+
 export default router

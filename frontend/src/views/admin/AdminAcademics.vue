@@ -125,7 +125,7 @@ import BaseModal from '@/components/base/BaseModal.vue'
 import BaseInput from '@/components/base/BaseInput.vue'
 import Column from 'primevue/column'
 import { useToast } from 'primevue/usetoast'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const students = ref([])
 const selectedStudentId = ref('')
@@ -140,8 +140,8 @@ const form = reactive({})
 
 const fetchStudents = async () => {
   try {
-    const res = await fetch('${API_BASE_URL}/api/admin/academics.php')
-    students.value = await res.json()
+    const res = await api.get('/api/admin/academics.php')
+    students.value = res.data
   } catch(e) { console.error(e) }
 }
 
@@ -149,8 +149,8 @@ const fetchStudentData = async () => {
   if (!selectedStudentId.value) return
   loading.value = true
   try {
-    const res = await fetch(`${API_BASE_URL}/api/admin/academics.php?student_id=${selectedStudentId.value}`)
-    academicData.value = await res.json()
+    const res = await api.get(`/api/admin/academics.php?student_id=${selectedStudentId.value}`)
+    academicData.value = res.data
   } catch(e) { console.error(e) }
   loading.value = false
 }
@@ -177,12 +177,9 @@ const editItem = (type, item) => {
 const saveItem = async (type) => {
   const method = isEdit.value ? 'PUT' : 'POST'
   try {
-    const res = await fetch(`${API_BASE_URL}/api/admin/academics.php`, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, type, student_id: selectedStudentId.value })
-    })
-    if (res.ok) {
+    const payload = { ...form, type, student_id: selectedStudentId.value }
+    const res = await api[method.toLowerCase()]('/api/admin/academics.php', payload)
+    if (res.data) {
       toast.add({ severity: 'success', summary: 'Success', detail: 'Record saved', life: 3000 })
       showMarkModal.value = false
       showAttendanceModal.value = false
@@ -194,11 +191,7 @@ const saveItem = async (type) => {
 const deleteItem = async (type, id) => {
   if (!confirm('Are you sure?')) return
   try {
-    const res = await fetch(`${API_BASE_URL}/api/admin/academics.php`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, [type === 'mark' ? 'mark_id' : 'attendance_id']: id })
-    })
+    const res = await api.delete('/api/admin/academics.php', { data: { type, [type === 'mark' ? 'mark_id' : 'attendance_id']: id } })
     if (res.ok) {
       toast.add({ severity: 'info', summary: 'Deleted', detail: 'Record removed', life: 3000 })
       await fetchStudentData()

@@ -42,26 +42,22 @@ import BaseButton from '@/components/base/BaseButton.vue'
 import BaseTable from '@/components/base/BaseTable.vue'
 import Column from 'primevue/column'
 import { useToast } from 'primevue/usetoast'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const enrollments = ref([])
 const toast = useToast()
 
 const fetchEnrollments = async () => {
   try {
-    const res = await fetch('${API_BASE_URL}/api/admin/enrollments.php')
-    enrollments.value = await res.json()
+    const res = await api.get('/api/admin/enrollments.php')
+    enrollments.value = res.data
   } catch(e) { console.error(e) }
 }
 
 const updateStatus = async (id, status) => {
   if(!confirm(`Are you sure you want to mark this as ${status}?`)) return
   try {
-    await fetch('${API_BASE_URL}/api/admin/enrollments.php', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ enrollment_id: id, status: status })
-    })
+    await api.put('/api/admin/enrollments.php', { enrollment_id: id, status: status })
     await fetchEnrollments()
     toast.add({ severity: status === 'Approved' ? 'success' : 'warn', summary: 'Status Updated', detail: `Enrollment marked as ${status}`, life: 3000 })
   } catch(e) { console.error(e) }

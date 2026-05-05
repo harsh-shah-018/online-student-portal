@@ -87,7 +87,7 @@ import BaseTable from '@/components/base/BaseTable.vue'
 import BaseModal from '@/components/base/BaseModal.vue'
 import Column from 'primevue/column'
 import { useToast } from 'primevue/usetoast'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const courses = ref([])
 const showAddForm = ref(false)
@@ -106,19 +106,15 @@ const form = reactive({
 
 const fetchCourses = async () => {
   try {
-    const res = await fetch('${API_BASE_URL}/api/admin/courses.php')
-    courses.value = await res.json()
+    const res = await api.get('/api/admin/courses.php')
+    courses.value = res.data
   } catch(e) { console.error(e) }
 }
 
 const addCourse = async () => {
   loading.value = true
   try {
-    await fetch('${API_BASE_URL}/api/admin/courses.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    })
+    await api.post('/api/admin/courses.php', form)
     showAddForm.value = false
     form.course_name = ''; form.fees = '';
     await fetchCourses()
@@ -139,11 +135,7 @@ const editCourse = (course) => {
 const updateCourse = async () => {
   loading.value = true
   try {
-    await fetch('${API_BASE_URL}/api/admin/courses.php', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(selectedCourse.value)
-    })
+    await api.put('/api/admin/courses.php', selectedCourse.value)
     showEditModal.value = false
     await fetchCourses()
     toast.add({ severity: 'success', summary: 'Updated', detail: 'Course updated successfully', life: 3000 })
@@ -154,11 +146,7 @@ const updateCourse = async () => {
 const deleteCourse = async (id) => {
   if(!confirm('Are you sure you want to delete this course?')) return
   try {
-    await fetch('${API_BASE_URL}/api/admin/courses.php', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ course_id: id })
-    })
+    await api.delete('/api/admin/courses.php', { data: { course_id: id } })
     await fetchCourses()
     toast.add({ severity: 'info', summary: 'Deleted', detail: 'Course has been removed', life: 3000 })
   } catch(e) { console.error(e) }

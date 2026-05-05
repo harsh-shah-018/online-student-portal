@@ -48,7 +48,7 @@ import BaseInput from '@/components/base/BaseInput.vue'
 import BaseTable from '@/components/base/BaseTable.vue'
 import Column from 'primevue/column'
 import { useToast } from 'primevue/usetoast'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const notices = ref([])
 const showAddForm = ref(false)
@@ -63,8 +63,8 @@ const form = reactive({
 
 const fetchNotices = async () => {
   try {
-    const res = await fetch('${API_BASE_URL}/api/admin/notices.php')
-    notices.value = await res.json()
+    const res = await api.get('/api/admin/notices.php')
+    notices.value = res.data
   } catch(e) { console.error(e) }
 }
 
@@ -74,11 +74,7 @@ const addNotice = async () => {
   form.author_admin_id = user.admin_id
 
   try {
-    await fetch('${API_BASE_URL}/api/admin/notices.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    })
+    await api.post('/api/admin/notices.php', form)
     showAddForm.value = false
     form.title = ''; form.content = '';
     await fetchNotices()
@@ -90,11 +86,7 @@ const addNotice = async () => {
 const deleteNotice = async (id) => {
   if(!confirm('Delete this notice?')) return
   try {
-    await fetch('${API_BASE_URL}/api/admin/notices.php', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notice_id: id })
-    })
+    await api.delete('/api/admin/notices.php', { data: { notice_id: id } })
     await fetchNotices()
     toast.add({ severity: 'info', summary: 'Deleted', detail: 'Notice deleted', life: 3000 })
   } catch(e) { console.error(e) }

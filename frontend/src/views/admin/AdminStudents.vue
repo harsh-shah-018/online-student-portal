@@ -91,7 +91,7 @@ import BaseTable from '@/components/base/BaseTable.vue'
 import BaseModal from '@/components/base/BaseModal.vue'
 import Column from 'primevue/column'
 import { useToast } from 'primevue/usetoast'
-import API_BASE_URL from '@/config/api'
+import api from '@/config/api'
 
 const students = ref([])
 const showAddForm = ref(false)
@@ -113,19 +113,15 @@ const form = reactive({
 
 const fetchStudents = async () => {
   try {
-    const res = await fetch('${API_BASE_URL}/api/admin/students.php')
-    students.value = await res.json()
+    const res = await api.get('/api/admin/students.php')
+    students.value = res.data
   } catch(e) { console.error(e) }
 }
 
 const addStudent = async () => {
   loading.value = true
   try {
-    await fetch('${API_BASE_URL}/api/admin/students.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    })
+    await api.post('/api/admin/students.php', form)
     showAddForm.value = false
     form.name = ''; form.email = ''; form.password = '';
     await fetchStudents()
@@ -146,11 +142,7 @@ const editStudent = (student) => {
 const updateStudent = async () => {
   loading.value = true
   try {
-    await fetch('${API_BASE_URL}/api/admin/students.php', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(selectedStudent.value)
-    })
+    await api.put('/api/admin/students.php', selectedStudent.value)
     showEditModal.value = false
     await fetchStudents()
     toast.add({ severity: 'success', summary: 'Updated', detail: 'Student details updated', life: 3000 })
@@ -161,11 +153,7 @@ const updateStudent = async () => {
 const deleteStudent = async (id) => {
   if(!confirm('Are you sure?')) return
   try {
-    await fetch('${API_BASE_URL}/api/admin/students.php', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ student_id: id })
-    })
+    await api.delete('/api/admin/students.php', { data: { student_id: id } })
     await fetchStudents()
     toast.add({ severity: 'info', summary: 'Deleted', detail: 'Student has been removed', life: 3000 })
   } catch(e) { console.error(e) }
