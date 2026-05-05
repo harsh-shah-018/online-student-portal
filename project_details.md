@@ -7,8 +7,9 @@ This project was developed using a modern, decoupled **Single Page Application (
 - **Framework**: Vue 3 (Composition API) via Vite.
 - **Styling**: Tailwind CSS for a premium, classic aesthetic (glassmorphism accents, soft gradients).
 - **Component Library**: PrimeVue (Aura Theme) wrapped in custom `Base` components (`BaseInput`, `BaseButton`, `BaseTable`) to ensure reusability and clean code structure.
-- **Routing**: Vue Router for seamless navigation between Admin and Student portals.
-- **State**: Pinia (configured) and `localStorage` for session/auth handling.
+- **Routing & Guards**: Vue Router for seamless navigation between Admin and Student portals, completely protected by global authentication guards.
+- **State**: Pinia and `localStorage` for centralized session and authentication handling.
+- **HTTP Client**: Axios configured via `.env` variables for standardized REST API communication.
 
 ### Backend
 - **Framework**: Vanilla PHP 8.x designed as a RESTful API.
@@ -34,7 +35,8 @@ To satisfy the reviewer's comment ("Try to add few more tables to increase compl
 1. **Unified Authentication**: Single login view that intelligently routes to either the Admin or Student dashboard based on the selected role.
 2. **Admin Dashboard**: Real-time statistics tracking total students, active courses, pending enrollments, and revenue collected.
 3. **Student Dashboard**: Personalized view displaying enrolled courses, total fees paid, and the latest institutional announcements.
-4. **API Endpoints**: Structured `backend/api/` folder neatly separating `auth/`, `admin/`, and `student/` logic for easy maintainability.
+4. **API Endpoints**: Structured `backend/api/` folder neatly separating `auth/`, `admin/`, and `student/` logic with strict PDO Prepared Statement usage for security.
+5. **Secure SPA Navigation**: Global route guards and Pinia authentication states to strictly protect dashboards against unauthenticated access.
 
 ## How it meets the requirements:
 - **"Project size is little small"**: The addition of Vue.js SPA routing, a fully decoupled REST API, and 12 database tables significantly increases the code surface area and logical complexity.
